@@ -1,0 +1,6 @@
+{
+  "name": "Mizan — Daily Expense & Monthly Budget Tracker",
+  "description": "Personal daily expense tracker and monthly budget manager with multi-currency support, monthly graph analytics, budget limit alerts, biometric privacy lock, dark mode, and cloud backup.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

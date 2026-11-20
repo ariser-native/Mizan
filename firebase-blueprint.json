@@ -1,0 +1,167 @@
+{
+  "entities": {
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User financial preferences, base currency, monthly overall budget, exchange rates, and privacy/notification settings.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the owner",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User display name",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "baseCurrency": {
+          "type": "string",
+          "enum": ["PKR", "USD", "EUR", "GBP", "AED", "SAR", "INR", "CAD"],
+          "description": "Primary display currency code"
+        },
+        "monthlyBudget": {
+          "type": "number",
+          "description": "Overall monthly budget in base currency"
+        },
+        "alertThresholdPct": {
+          "type": "number",
+          "description": "Percentage threshold (50-95) to trigger budget warning notifications"
+        },
+        "darkMode": {
+          "type": "boolean",
+          "description": "Preferred UI theme"
+        },
+        "browserNotifications": {
+          "type": "boolean",
+          "description": "Whether browser push notifications are enabled"
+        },
+        "exchangeRates": {
+          "type": "object",
+          "description": "Map of currency codes to USD-relative rates"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp"
+        }
+      },
+      "required": ["uid", "baseCurrency", "monthlyBudget", "alertThresholdPct", "darkMode", "createdAt", "updatedAt"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "A single daily expense record owned by a user.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique expense identifier",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Owner Firebase Auth UID",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "title": {
+          "type": "string",
+          "description": "Short description of the expense",
+          "minLength": 1,
+          "maxLength": 120
+        },
+        "amount": {
+          "type": "number",
+          "description": "Positive expense amount in its original currency"
+        },
+        "currency": {
+          "type": "string",
+          "enum": ["PKR", "USD", "EUR", "GBP", "AED", "SAR", "INR", "CAD"],
+          "description": "Currency of the recorded expense"
+        },
+        "category": {
+          "type": "string",
+          "enum": ["food", "housing", "transport", "utilities", "health", "shopping", "entertainment", "education", "other"],
+          "description": "Expense category identifier"
+        },
+        "date": {
+          "type": "string",
+          "description": "ISO date string YYYY-MM-DD",
+          "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}$"
+        },
+        "paymentMethod": {
+          "type": "string",
+          "enum": ["cash", "card", "bank", "wallet"],
+          "description": "Payment method used"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional expense note",
+          "maxLength": 400
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server creation timestamp"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server update timestamp"
+        }
+      },
+      "required": ["id", "userId", "title", "amount", "currency", "category", "date", "paymentMethod", "createdAt", "updatedAt"]
+    },
+    "CategoryBudget": {
+      "title": "CategoryBudget",
+      "description": "Per-category monthly spending limit.",
+      "type": "object",
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["food", "housing", "transport", "utilities", "health", "shopping", "entertainment", "education", "other"]
+        },
+        "userId": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "limit": {
+          "type": "number",
+          "description": "Monthly budget limit in user base currency"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": ["category", "userId", "limit", "updatedAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": { "$ref": "#/entities/UserProfile" },
+      "description": "Stores user preferences, base currency, monthly budget cap, and exchange rate overrides."
+    },
+    "/users/{userId}/expenses/{expenseId}": {
+      "schema": { "$ref": "#/entities/Expense" },
+      "description": "Stores daily expense entries belonging to the authenticated user."
+    },
+    "/users/{userId}/categoryBudgets/{categoryId}": {
+      "schema": { "$ref": "#/entities/CategoryBudget" },
+      "description": "Stores per-category monthly budget caps belonging to the authenticated user."
+    }
+  }
+}
