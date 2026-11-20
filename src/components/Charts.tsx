@@ -322,8 +322,8 @@ export const CategoryDonutChart: React.FC<CategoryDonutProps> = ({ items, curren
   let offset = 0;
 
   return (
-    <div className="flex flex-col sm:flex-row items-center gap-6">
-      <div className="relative w-36 h-36 shrink-0 flex items-center justify-center">
+    <div className="flex flex-col sm:flex-row lg:flex-col 2xl:flex-row items-center gap-5">
+      <div className="relative w-32 h-32 shrink-0 flex items-center justify-center">
         <svg viewBox="0 0 144 144" className="w-full h-full -rotate-90" role="img" aria-label="Category spending distribution">
           <circle
             cx="72"

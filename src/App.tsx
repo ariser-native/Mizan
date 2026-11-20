@@ -59,6 +59,12 @@ import {
   DEFAULT_CATEGORY_BUDGETS,
   DEFAULT_PREFERENCES,
 } from './utils/seedData';
+import {
+  ADSTERRA_BANNERS,
+  AdsterraBanner,
+  AdsterraNativeBanner,
+  AdsterraSmartlinkCard,
+} from './components/AdsterraAds';
 import { BudgetsView } from './components/BudgetsView';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { ExpenseModal } from './components/ExpenseModal';
@@ -577,8 +583,8 @@ function DashboardShell() {
   return (
     <div className="min-h-screen flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
-        <div className="h-16 px-6 flex items-center border-b border-slate-200 dark:border-slate-800">
+      <aside className="hidden lg:flex lg:w-64 lg:flex-col lg:fixed lg:inset-y-0 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-y-auto print:hidden">
+        <div className="h-16 px-6 flex items-center shrink-0 border-b border-slate-200 dark:border-slate-800">
           <span className="text-lg font-bold font-display tracking-tight text-slate-900 dark:text-slate-100 whitespace-nowrap">
             Mizan
           </span>
@@ -648,6 +654,10 @@ function DashboardShell() {
                 Lock
               </button>
             )}
+          </div>
+
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex justify-center">
+            <AdsterraBanner slot={ADSTERRA_BANNERS.banner160x300} />
           </div>
         </div>
       </aside>
@@ -818,109 +828,151 @@ function DashboardShell() {
           </div>
         </header>
 
-        {/* Active View Content */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto">
-          {activeTab === 'overview' && (
-            <OverviewView
-              selectedMonth={selectedMonth}
-              availableMonths={availableMonths}
-              onSelectMonth={setSelectedMonth}
-              baseCurrency={preferences.baseCurrency}
-              exchangeRates={preferences.exchangeRates}
-              monthlyBudget={preferences.monthlyBudget}
-              alertThresholdPct={preferences.alertThresholdPct}
-              monthExpenses={monthExpenses}
-              totalSpent={totalSpent}
-              remaining={remaining}
-              dailySafe={dailySafe}
-              daysRemaining={daysRemaining}
-              monthlySeries6={monthlySeries6}
-              monthlySeries12={monthlySeries12}
-              dailySeries={dailySeries}
-              categoryBreakdown={categoryBreakdown}
-              onAddExpense={() => {
-                setEditingExpense(null);
-                setExpenseModalOpen(true);
-              }}
-              onEditExpense={(exp) => {
-                setEditingExpense(exp);
-                setExpenseModalOpen(true);
-              }}
-              onDeleteExpense={handleDeleteExpense}
-              onViewAllExpenses={() => setActiveTab('expenses')}
-              onViewReports={() => setActiveTab('reports')}
-            />
-          )}
+        {/* Active View Content + Optional Right Ad Rail */}
+        <div className="flex-1 flex items-start justify-center gap-6 max-w-[1380px] w-full mx-auto">
+          <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8 space-y-8">
+            {activeTab === 'overview' && (
+              <OverviewView
+                selectedMonth={selectedMonth}
+                availableMonths={availableMonths}
+                onSelectMonth={setSelectedMonth}
+                baseCurrency={preferences.baseCurrency}
+                exchangeRates={preferences.exchangeRates}
+                monthlyBudget={preferences.monthlyBudget}
+                alertThresholdPct={preferences.alertThresholdPct}
+                monthExpenses={monthExpenses}
+                totalSpent={totalSpent}
+                remaining={remaining}
+                dailySafe={dailySafe}
+                daysRemaining={daysRemaining}
+                monthlySeries6={monthlySeries6}
+                monthlySeries12={monthlySeries12}
+                dailySeries={dailySeries}
+                categoryBreakdown={categoryBreakdown}
+                onAddExpense={() => {
+                  setEditingExpense(null);
+                  setExpenseModalOpen(true);
+                }}
+                onEditExpense={(exp) => {
+                  setEditingExpense(exp);
+                  setExpenseModalOpen(true);
+                }}
+                onDeleteExpense={handleDeleteExpense}
+                onViewAllExpenses={() => setActiveTab('expenses')}
+                onViewReports={() => setActiveTab('reports')}
+              />
+            )}
 
-          {activeTab === 'expenses' && (
-            <ExpensesView
-              expenses={expenses}
-              selectedMonth={selectedMonth}
-              availableMonths={availableMonths}
-              onSelectMonth={setSelectedMonth}
-              baseCurrency={preferences.baseCurrency}
-              exchangeRates={preferences.exchangeRates}
-              onAddExpense={() => {
-                setEditingExpense(null);
-                setExpenseModalOpen(true);
-              }}
-              onEditExpense={(exp) => {
-                setEditingExpense(exp);
-                setExpenseModalOpen(true);
-              }}
-              onDeleteExpense={handleDeleteExpense}
-            />
-          )}
+            {activeTab === 'expenses' && (
+              <ExpensesView
+                expenses={expenses}
+                selectedMonth={selectedMonth}
+                availableMonths={availableMonths}
+                onSelectMonth={setSelectedMonth}
+                baseCurrency={preferences.baseCurrency}
+                exchangeRates={preferences.exchangeRates}
+                onAddExpense={() => {
+                  setEditingExpense(null);
+                  setExpenseModalOpen(true);
+                }}
+                onEditExpense={(exp) => {
+                  setEditingExpense(exp);
+                  setExpenseModalOpen(true);
+                }}
+                onDeleteExpense={handleDeleteExpense}
+              />
+            )}
 
-          {activeTab === 'budgets' && (
-            <BudgetsView
-              selectedMonth={selectedMonth}
-              baseCurrency={preferences.baseCurrency}
-              monthlyBudget={preferences.monthlyBudget}
-              alertThresholdPct={preferences.alertThresholdPct}
-              categoryBudgets={categoryBudgets}
-              categoryBreakdown={categoryBreakdown}
-              totalSpent={totalSpent}
-              onSaveOverallBudget={handleSaveOverallBudget}
-              onSaveCategoryBudget={handleSaveCategoryBudget}
-            />
-          )}
+            {activeTab === 'budgets' && (
+              <BudgetsView
+                selectedMonth={selectedMonth}
+                baseCurrency={preferences.baseCurrency}
+                monthlyBudget={preferences.monthlyBudget}
+                alertThresholdPct={preferences.alertThresholdPct}
+                categoryBudgets={categoryBudgets}
+                categoryBreakdown={categoryBreakdown}
+                totalSpent={totalSpent}
+                onSaveOverallBudget={handleSaveOverallBudget}
+                onSaveCategoryBudget={handleSaveCategoryBudget}
+              />
+            )}
 
-          {activeTab === 'reports' && (
-            <ReportsView
-              selectedMonth={selectedMonth}
-              availableMonths={availableMonths}
-              onSelectMonth={setSelectedMonth}
-              baseCurrency={preferences.baseCurrency}
-              exchangeRates={preferences.exchangeRates}
-              monthExpenses={monthExpenses}
-              monthlySeries12={monthlySeries12}
-              dailySeries={dailySeries}
-              categoryBreakdown={categoryBreakdown}
-              totalSpent={totalSpent}
-              monthlyBudget={preferences.monthlyBudget}
-              user={user}
-            />
-          )}
+            {activeTab === 'reports' && (
+              <ReportsView
+                selectedMonth={selectedMonth}
+                availableMonths={availableMonths}
+                onSelectMonth={setSelectedMonth}
+                baseCurrency={preferences.baseCurrency}
+                exchangeRates={preferences.exchangeRates}
+                monthExpenses={monthExpenses}
+                monthlySeries12={monthlySeries12}
+                dailySeries={dailySeries}
+                categoryBreakdown={categoryBreakdown}
+                totalSpent={totalSpent}
+                monthlyBudget={preferences.monthlyBudget}
+                user={user}
+              />
+            )}
 
-          {activeTab === 'settings' && (
-            <SettingsBackupView
-              user={user}
-              cloudSyncing={cloudSyncing}
-              lastSyncedAt={lastSyncedAt}
-              cloudError={cloudError}
-              expenses={expenses}
-              categoryBudgets={categoryBudgets}
-              preferences={preferences}
-              onSignInGoogle={handleSignInGoogle}
-              onSignOut={handleSignOut}
-              onManualCloudSync={handleManualCloudSync}
-              onUpdatePreferences={handleUpdatePreferences}
-              onRestoreBackup={handleRestoreBackup}
-              onLockNow={() => setIsLocked(true)}
-            />
-          )}
-        </main>
+            {activeTab === 'settings' && (
+              <SettingsBackupView
+                user={user}
+                cloudSyncing={cloudSyncing}
+                lastSyncedAt={lastSyncedAt}
+                cloudError={cloudError}
+                expenses={expenses}
+                categoryBudgets={categoryBudgets}
+                preferences={preferences}
+                onSignInGoogle={handleSignInGoogle}
+                onSignOut={handleSignOut}
+                onManualCloudSync={handleManualCloudSync}
+                onUpdatePreferences={handleUpdatePreferences}
+                onRestoreBackup={handleRestoreBackup}
+                onLockNow={() => setIsLocked(true)}
+              />
+            )}
+
+            {/* Adsterra Monetization Placements */}
+            <div className="space-y-6 pt-2 border-t border-slate-200/80 dark:border-slate-800/80 print:hidden">
+              {(activeTab === 'overview' || activeTab === 'reports') ? (
+                <>
+                  <AdsterraBanner
+                    slot={ADSTERRA_BANNERS.banner728x90}
+                    className="hidden lg:flex"
+                  />
+                  <AdsterraBanner
+                    slot={ADSTERRA_BANNERS.banner468x60}
+                    className="hidden sm:flex lg:hidden"
+                  />
+                </>
+              ) : (
+                <AdsterraBanner
+                  slot={ADSTERRA_BANNERS.banner468x60}
+                  className="hidden sm:flex"
+                />
+              )}
+
+              <AdsterraBanner
+                slot={ADSTERRA_BANNERS.banner320x50}
+                className="flex sm:hidden"
+              />
+
+              <AdsterraNativeBanner />
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+                <AdsterraSmartlinkCard className="md:col-span-7" />
+                <div className="md:col-span-5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-4 flex items-center justify-center">
+                  <AdsterraBanner slot={ADSTERRA_BANNERS.banner300x250} />
+                </div>
+              </div>
+            </div>
+          </main>
+
+          {/* Desktop 160x600 Wide Skyscraper Rail */}
+          <aside className="hidden xl:flex xl:w-[184px] xl:shrink-0 sticky top-20 pt-8 pr-6 justify-center print:hidden">
+            <AdsterraBanner slot={ADSTERRA_BANNERS.banner160x600} />
+          </aside>
+        </div>
       </div>
 
       {/* Modals & Privacy Overlay */}
